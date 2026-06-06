@@ -77,6 +77,9 @@ const getInvoiceById = async (req, res) => {
       path: "customer",
       populate: { path: "company" },
     });
+    if(!invoice){
+        return res.status(404).json({message: "Invoice not found"})
+    }
     res.json(invoice);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -118,8 +121,28 @@ const createInvoice = async (req, res) => {
   }
 };
 
+const updateInvoiceById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const invoice = await Invoice.findById(id);
+    if (!invoice) {
+      return res.status(404).json({ message: "Invoice not found" });
+    }
+
+    const updatedInvoice = await Invoice.findByIdAndUpdate(id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+
+    res.json(updatedInvoice);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   getAllInvoices,
   getInvoiceById,
   createInvoice,
+  updateInvoiceById
 };
