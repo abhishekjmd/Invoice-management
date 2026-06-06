@@ -77,8 +77,8 @@ const getInvoiceById = async (req, res) => {
       path: "customer",
       populate: { path: "company" },
     });
-    if(!invoice){
-        return res.status(404).json({message: "Invoice not found"})
+    if (!invoice) {
+      return res.status(404).json({ message: "Invoice not found" });
     }
     res.json(invoice);
   } catch (error) {
@@ -140,9 +140,88 @@ const updateInvoiceById = async (req, res) => {
   }
 };
 
+const getInvoiceSummary = async (req, res) => {
+  try {
+    const summary = await Invoice.aggregate([
+      {
+        $group: {
+          _id: null,
+          totalBilled: {
+            $sum: "$total",
+          },
+
+          totalTax: {
+            $sum: "$tax",
+          },
+
+          totalInvoices: {
+            $sum: 1,
+          },
+
+          customers: {
+            $addToSet: "$customer",
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          totalBilled: 1,
+          totalTax: 1,
+          totalInvoices: 1,
+          totalCustomers: {
+            $size: "$customers",
+          },
+        },
+      },
+    ]);
+
+    const topCustomer = await Invoice.aggregate([
+      {
+        $group: {
+          _id: "$customer",
+
+          totalValue: {
+            $sum: "$total",
+          },
+        },
+      },
+      {
+        $sort: {
+          totalValue: -1,
+        },
+      },
+      {
+        $limit: 1,
+      },
+      {
+        $lookup: {
+          from: "customers",
+          localField: "_id",
+          foreignField: "_id",
+          as: "customer",
+        },
+      },
+      {
+        $unwind: "$customer",
+      },
+    ]);
+
+    res.json({
+      ...summary[0],
+      topCustomer: topCustomer[0] || null,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   getAllInvoices,
   getInvoiceById,
   createInvoice,
-  updateInvoiceById
+  updateInvoiceById,
+  getInvoiceSummary
 };
