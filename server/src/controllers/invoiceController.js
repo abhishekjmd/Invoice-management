@@ -43,7 +43,7 @@ const createInvoice = async (req, res) => {
     if (!isCustomerExist) {
       return res.status(400).json({ message: "Customer not found" });
     }
-    const invoice = new Invoice.create({
+    const invoice = await Invoice.create({
       invoiceId,
       customer,
       amount,
