@@ -2,11 +2,69 @@ const Invoice = require("../models/invoice");
 const Customer = require("../models/customer");
 
 const getAllInvoices = async (req, res) => {
+  const {
+    page = 1,
+    limit = 10,
+    status,
+    customer,
+    issueDateFrom,
+    issueDateTo,
+    dueDateFrom,
+    dueDateTo,
+    sortBy,
+    order,
+  } = req.query;
+  const query = {};
+  const sortOptions = {};
   try {
-    const invoices = await Invoice.find().populate({
-      path: "customer",
-      populate: { path: "company" },
-    });
+    const pageNumber = parseInt(page);
+    const limitNumber = parseInt(limit);
+
+    const skip = (pageNumber - 1) * limitNumber;
+
+    if (status) {
+      query.status = status;
+    }
+
+    if (customer) {
+      query.customer = customer;
+    }
+    if (issueDateFrom || issueDateTo) {
+      query.issueDate = {};
+    }
+
+    if (issueDateFrom) {
+      query.issueDate.$gte = new Date(issueDateFrom);
+    }
+
+    if (issueDateTo) {
+      query.issueDate.$lte = new Date(issueDateTo);
+    }
+    if (dueDateFrom || dueDateTo) {
+      query.dueDate = {};
+    }
+
+    if (dueDateFrom) {
+      query.dueDate.$gte = new Date(dueDateFrom);
+    }
+
+    if (dueDateTo) {
+      query.dueDate.$lte = new Date(dueDateTo);
+    }
+
+    if (sortBy) {
+      sortOptions[sortBy] = order === "desc" ? -1 : 1;
+    }
+
+    const invoices = await Invoice.find(query)
+      .populate({
+        path: "customer",
+        populate: { path: "company" },
+      })
+      .skip(skip)
+      .limit(limitNumber)
+      .sort(sortOptions);
+
     res.json(invoices);
   } catch (error) {
     res.status(500).json({ message: error.message });
