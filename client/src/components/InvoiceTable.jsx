@@ -1,18 +1,55 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-function InvoiceTable({ invoices, search, status, onEdit }) {
+function InvoiceTable({ invoices, search, onEdit, sortBy, order, onSort }) {
   const navigate = useNavigate();
 
   const filtered = invoices.filter((inv) => {
     const q = (search || "").toLowerCase();
-    const matchSearch =
+    return (
       !q ||
       inv.invoiceId?.toLowerCase().includes(q) ||
-      inv.customer?.name?.toLowerCase().includes(q);
-    const matchStatus = !status || inv.status === status;
-    return matchSearch && matchStatus;
+      inv.customer?.name?.toLowerCase().includes(q)
+    );
   });
+
+  const SortHeader = ({ label, field }) => {
+    const active = sortBy === field;
+    const arrow = active ? (order === "asc" ? " ↑" : " ↓") : " ↕";
+    return (
+      <th
+        onClick={() => onSort(field)}
+        style={{
+          textAlign: "left",
+          padding: "10px 16px",
+          fontSize: 12,
+          fontWeight: 500,
+          color: active ? "#111" : "#888",
+          whiteSpace: "nowrap",
+          cursor: "pointer",
+          userSelect: "none",
+        }}
+      >
+        {label}
+        <span style={{ color: "#bbb" }}>{arrow}</span>
+      </th>
+    );
+  };
+
+  const PlainHeader = ({ label }) => (
+    <th
+      style={{
+        textAlign: "left",
+        padding: "10px 16px",
+        fontSize: 12,
+        fontWeight: 500,
+        color: "#888",
+        whiteSpace: "nowrap",
+      }}
+    >
+      {label}
+    </th>
+  );
 
   return (
     <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
@@ -20,40 +57,22 @@ function InvoiceTable({ invoices, search, status, onEdit }) {
         <tr
           style={{ borderBottom: "1px solid #e5e5e5", background: "#fafafa" }}
         >
-          {[
-            "Invoice",
-            "Customer",
-            "Company",
-            "Amount",
-            "Tax%",
-            "Total",
-            "Status",
-            "",
-          ].map((h, i) => (
-            <th
-              key={i}
-              style={{
-                textAlign: "left",
-                padding: "10px 16px",
-                fontSize: 12,
-                fontWeight: 500,
-                color: "#888",
-                whiteSpace: "nowrap",
-              }}
-            >
-              {h}{" "}
-              {["Invoice", "Customer", "Amount", "Total"].includes(h)
-                ? "↕"
-                : ""}
-            </th>
-          ))}
+          <PlainHeader label="Invoice" />
+          <PlainHeader label="Customer" />
+          <PlainHeader label="Company" />
+          <SortHeader label="Amount" field="amount" />
+          <PlainHeader label="Tax%" />
+          <PlainHeader label="Total" />
+          <PlainHeader label="Status" />
+          <SortHeader label="Due date" field="dueDate" />
+          <th />
         </tr>
       </thead>
       <tbody>
         {filtered.length === 0 ? (
           <tr>
             <td
-              colSpan={8}
+              colSpan={9}
               style={{ padding: "32px", textAlign: "center", color: "#bbb" }}
             >
               No invoices found
@@ -108,6 +127,15 @@ function InvoiceTable({ invoices, search, status, onEdit }) {
                 >
                   {inv.status}
                 </span>
+              </td>
+              <td style={{ padding: "11px 16px", color: "#888" }}>
+                {inv.dueDate
+                  ? new Date(inv.dueDate).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    })
+                  : "—"}
               </td>
               <td style={{ padding: "11px 16px", textAlign: "right" }}>
                 <button
