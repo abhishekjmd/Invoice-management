@@ -1,12 +1,17 @@
-import React from 'react'
-import Dashboard from './pages/Dashboard'
+import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Dashboard from "./pages/Dashboard";
+import CustomerProfile from "./pages/CustomerProfile";
 
 function App() {
   return (
-    <div>
-      <Dashboard />
-    </div>
-  )
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/customers/:id" element={<CustomerProfile />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;

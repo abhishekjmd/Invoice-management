@@ -1,15 +1,9 @@
 import React from "react";
-
-const columns = [
-  { key: "invoiceId", label: "Invoice" },
-  { key: "customer", label: "Customer" },
-  { key: "amount", label: "Amount" },
-  { key: "taxRate", label: "Tax%" },
-  { key: "total", label: "Total" },
-  { key: "status", label: "Status" },
-];
+import { useNavigate } from "react-router-dom";
 
 function InvoiceTable({ invoices, search, status }) {
+  const navigate = useNavigate();
+
   const filtered = invoices.filter((inv) => {
     const q = (search || "").toLowerCase();
     const matchSearch =
@@ -26,9 +20,17 @@ function InvoiceTable({ invoices, search, status }) {
         <tr
           style={{ borderBottom: "1px solid #e5e5e5", background: "#fafafa" }}
         >
-          {columns.map((col) => (
+          {[
+            "Invoice",
+            "Customer",
+            "Company",
+            "Amount",
+            "Tax%",
+            "Total",
+            "Status",
+          ].map((h) => (
             <th
-              key={col.key}
+              key={h}
               style={{
                 textAlign: "left",
                 padding: "10px 16px",
@@ -38,8 +40,8 @@ function InvoiceTable({ invoices, search, status }) {
                 whiteSpace: "nowrap",
               }}
             >
-              {col.label}{" "}
-              {["Invoice", "Customer", "Amount", "Total"].includes(col.label)
+              {h}{" "}
+              {["Invoice", "Customer", "Amount", "Total"].includes(h)
                 ? "↕"
                 : ""}
             </th>
@@ -50,7 +52,7 @@ function InvoiceTable({ invoices, search, status }) {
         {filtered.length === 0 ? (
           <tr>
             <td
-              colSpan={6}
+              colSpan={7}
               style={{
                 padding: "32px",
                 textAlign: "center",
@@ -65,7 +67,7 @@ function InvoiceTable({ invoices, search, status }) {
           filtered.map((inv) => (
             <tr
               key={inv._id}
-              style={{ borderBottom: "1px solid #f0f0f0", cursor: "default" }}
+              style={{ borderBottom: "1px solid #f0f0f0" }}
               onMouseEnter={(e) =>
                 (e.currentTarget.style.background = "#fafafa")
               }
@@ -74,8 +76,19 @@ function InvoiceTable({ invoices, search, status }) {
               <td style={{ padding: "11px 16px", color: "#555", fontSize: 13 }}>
                 {inv.invoiceId}
               </td>
-              <td style={{ padding: "11px 16px", color: "#111" }}>
+              <td
+                style={{
+                  padding: "11px 16px",
+                  color: "#111",
+                  cursor: "pointer",
+                  textDecoration: "underline",
+                }}
+                onClick={() => navigate(`/customers/${inv.customer?._id}`)}
+              >
                 {inv.customer?.name}
+              </td>
+              <td style={{ padding: "11px 16px", color: "#555" }}>
+                {inv.customer?.company?.name}
               </td>
               <td style={{ padding: "11px 16px", color: "#111" }}>
                 {inv.amount}
@@ -83,15 +96,12 @@ function InvoiceTable({ invoices, search, status }) {
               <td style={{ padding: "11px 16px", color: "#555" }}>
                 {inv.taxRate}%
               </td>
-              <td
-                style={{ padding: "11px 16px", color: "#111", fontWeight: 500 }}
-              >
+              <td style={{ padding: "11px 16px", fontWeight: 500 }}>
                 {inv.total}
               </td>
               <td style={{ padding: "11px 16px" }}>
                 <span
                   style={{
-                    display: "inline-block",
                     fontSize: 12,
                     padding: "3px 10px",
                     borderRadius: 4,
