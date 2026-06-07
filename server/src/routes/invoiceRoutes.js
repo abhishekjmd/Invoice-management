@@ -10,8 +10,9 @@ const {
 const router = express.Router();
 
 router.get("/", getAllInvoices);
+router.get("/summary", getInvoiceSummary);
 router.get("/:id", getInvoiceById);
 router.post("/", createInvoice);
 router.patch("/:id", updateInvoiceById);
-router.get("/summary", getInvoiceSummary);
+
 module.exports = router;

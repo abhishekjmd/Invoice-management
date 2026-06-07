@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-function InvoiceTable({ invoices, search, status }) {
+function InvoiceTable({ invoices, search, status, onEdit }) {
   const navigate = useNavigate();
 
   const filtered = invoices.filter((inv) => {
@@ -28,9 +28,10 @@ function InvoiceTable({ invoices, search, status }) {
             "Tax%",
             "Total",
             "Status",
-          ].map((h) => (
+            "",
+          ].map((h, i) => (
             <th
-              key={h}
+              key={i}
               style={{
                 textAlign: "left",
                 padding: "10px 16px",
@@ -52,13 +53,8 @@ function InvoiceTable({ invoices, search, status }) {
         {filtered.length === 0 ? (
           <tr>
             <td
-              colSpan={7}
-              style={{
-                padding: "32px",
-                textAlign: "center",
-                color: "#bbb",
-                fontSize: 13,
-              }}
+              colSpan={8}
+              style={{ padding: "32px", textAlign: "center", color: "#bbb" }}
             >
               No invoices found
             </td>
@@ -112,6 +108,23 @@ function InvoiceTable({ invoices, search, status }) {
                 >
                   {inv.status}
                 </span>
+              </td>
+              <td style={{ padding: "11px 16px", textAlign: "right" }}>
+                <button
+                  onClick={() => onEdit(inv)}
+                  style={{
+                    fontSize: 12,
+                    padding: "4px 10px",
+                    border: "1px solid #d0d0d0",
+                    borderRadius: 5,
+                    background: "#fff",
+                    color: "#555",
+                    cursor: "pointer",
+                    fontFamily: "inherit",
+                  }}
+                >
+                  Edit
+                </button>
               </td>
             </tr>
           ))
