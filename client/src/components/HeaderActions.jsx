@@ -1,6 +1,6 @@
 import React from "react";
 
-function HeaderActions({ onNewInvoice }) {
+function HeaderActions({ onNewInvoice, onSummary }) {
   return (
     <div
       style={{
@@ -14,7 +14,9 @@ function HeaderActions({ onNewInvoice }) {
         Invoices
       </span>
       <div style={{ display: "flex", gap: 8 }}>
-        <button style={outlineBtn}>Summary</button>
+        <button onClick={onSummary} style={outlineBtn}>
+          Summary
+        </button>
         <button onClick={onNewInvoice} style={primaryBtn}>
           + New invoice
         </button>
@@ -33,7 +35,6 @@ const outlineBtn = {
   cursor: "pointer",
   fontFamily: "inherit",
 };
-
 const primaryBtn = {
   fontSize: 13,
   padding: "6px 14px",

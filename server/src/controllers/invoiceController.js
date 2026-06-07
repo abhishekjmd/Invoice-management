@@ -176,24 +176,10 @@ const getInvoiceSummary = async (req, res) => {
       },
     ]);
 
-    const topCustomer = await Invoice.aggregate([
-      {
-        $group: {
-          _id: "$customer",
-
-          totalValue: {
-            $sum: "$total",
-          },
-        },
-      },
-      {
-        $sort: {
-          totalValue: -1,
-        },
-      },
-      {
-        $limit: 1,
-      },
+    const topCustomers = await Invoice.aggregate([
+      { $group: { _id: "$customer", totalValue: { $sum: "$total" } } },
+      { $sort: { totalValue: -1 } },
+      { $limit: 5 },
       {
         $lookup: {
           from: "customers",
@@ -202,14 +188,12 @@ const getInvoiceSummary = async (req, res) => {
           as: "customer",
         },
       },
-      {
-        $unwind: "$customer",
-      },
+      { $unwind: "$customer" },
     ]);
 
     res.json({
       ...summary[0],
-      topCustomer: topCustomer[0] || null,
+      topCustomers, 
     });
   } catch (error) {
     res.status(500).json({
@@ -223,5 +207,5 @@ module.exports = {
   getInvoiceById,
   createInvoice,
   updateInvoiceById,
-  getInvoiceSummary
+  getInvoiceSummary,
 };

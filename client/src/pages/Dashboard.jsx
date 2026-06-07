@@ -5,15 +5,17 @@ import InvoiceTable from "../components/InvoiceTable";
 import Pagination from "../components/Pagination";
 import HeaderActions from "../components/HeaderActions";
 import NewInvoiceModal from "../components/NewInvoiceModal";
+import SummaryModal from "../components/SummaryModal";
 
 function Dashboard() {
   const [invoices, setInvoices] = useState([]);
   const [summary, setSummary] = useState({});
-  const [total, setTotal] = useState(0);
+  const [total, setTotal] = useState(null);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [showSummary, setShowSummary] = useState(false);
   const [editInvoice, setEditInvoice] = useState(null);
 
   const getInvoices = async () => {
@@ -29,7 +31,7 @@ function Dashboard() {
     try {
       const response = await api.get("/invoices/summary");
       setSummary(response.data);
-      setTotal(response.data.totalInvoices || 0);
+      setTotal(response.data.totalInvoices ?? null);
     } catch (error) {
       console.log(error);
     }
@@ -37,7 +39,7 @@ function Dashboard() {
 
   const handleSaved = () => {
     getInvoices();
-    getSummary(); // this updates total count immediately
+    getSummary();
   };
 
   useEffect(() => {
@@ -62,6 +64,7 @@ function Dashboard() {
           setEditInvoice(null);
           setShowModal(true);
         }}
+        onSummary={() => setShowSummary(true)}
       />
       <div
         style={{
@@ -98,6 +101,8 @@ function Dashboard() {
           onSaved={handleSaved}
         />
       )}
+
+      {showSummary && <SummaryModal onClose={() => setShowSummary(false)} />}
     </div>
   );
 }

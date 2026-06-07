@@ -1,6 +1,21 @@
 import React from "react";
 
-function Pagination({ page, setPage, total = 2000, perPage = 20 }) {
+function Pagination({ page, setPage, total, perPage = 20 }) {
+  if (total === null || total === undefined) {
+    return (
+      <div
+        style={{
+          padding: "12px 16px",
+          fontSize: 12,
+          color: "#888",
+          borderTop: "1px solid #e5e5e5",
+        }}
+      >
+        Loading...
+      </div>
+    );
+  }
+
   const totalPages = Math.ceil(total / perPage);
   const start = (page - 1) * perPage + 1;
   const end = Math.min(page * perPage, total);
@@ -80,14 +95,11 @@ const pageBtn = {
   alignItems: "center",
   justifyContent: "center",
 };
-
 const navBtn = {
   ...pageBtn,
   border: "1px solid #d0d0d0",
   background: "#fff",
   color: "#555",
-  width: 30,
-  height: 30,
 };
 
 export default Pagination;
