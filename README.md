@@ -53,26 +53,6 @@ https://github.com/abhishekjmd/Invoice-management
 
 ---
 
-# Data Modeling
-
-The application uses three main models:
-
-## Company
-
-Represents a company.
-
-## Customer
-
-Each customer belongs to exactly one company.
-
-## Invoice
-
-Invoices are linked to customers using MongoDB ObjectId references.
-
-This structure avoids data duplication and allows efficient querying and population of related data.
-
----
-
 # Setup Instructions
 
 ## 1. Clone Repository
@@ -162,6 +142,42 @@ This script:
 
 ---
 
+# Data Modeling Rationale
+
+The application uses three main models:
+
+## Company
+
+Represents a company entity.
+
+## Customer
+
+Each customer belongs to exactly one company.
+
+A separate customer model was created to:
+
+* avoid repeating customer data across invoices
+* maintain normalized relationships
+* allow efficient querying
+
+## Invoice
+
+Invoices are linked to customers using MongoDB ObjectId references.
+
+This structure:
+
+* avoids data duplication
+* improves scalability
+* enables nested population
+* supports aggregation queries efficiently
+
+Relationships:
+
+* One Company → Many Customers
+* One Customer → Many Invoices
+
+---
+
 # Analytics Implemented
 
 Using MongoDB aggregation pipelines:
@@ -177,5 +193,7 @@ Using MongoDB aggregation pipelines:
 # Assumptions
 
 * One customer belongs to exactly one company.
-* Invoice totals and tax values are provided in the dataset.
+* Invoice totals and tax values are already provided in the dataset.
 * MongoDB ObjectId references are used between collections.
+* Filtering, sorting, and pagination are implemented server-side.
+* The seed script can be rerun safely because old data is cleared before seeding.
